@@ -1,30 +1,154 @@
-# Hệ Thống Quản Lý Rạp Chiếu Phim (Cinema Management System)
+# 🎬 Movie Booking System
 
-Dự án đồ án môn học xây dựng ứng dụng quản lý rạp chiếu phim dựa trên ngôn ngữ Java, hỗ trợ quản lý lịch chiếu, đặt vé và doanh thu.
+A web-based movie ticket booking system built with **Spring Boot**, **MySQL**, and **Docker**.
+This project allows users to browse movies, view showtimes, and book tickets online.
 
-## 📌 Tính năng chính
+---
 
-* **Quản lý hệ thống:** Đăng nhập, phân quyền người dùng (Admin, Quản lý, Nhân viên).
-* **Quản lý phim:** Thêm, sửa, xóa thông tin phim, thể loại và thời lượng.
-* **Quản lý lịch chiếu:** Sắp xếp suất chiếu theo phòng và thời gian thực tế.
-* **Đặt vé & Sơ đồ ghế:** Giao diện chọn ghế trực quan, tính toán giá vé tự động.
-* **Thống kê & Báo cáo:** Theo dõi doanh thu theo ngày/tháng và suất chiếu.
+## 🚀 Features
 
-## 🛠 Công nghệ sử dụng
+* 🎥 View movie list and details
+* 🕒 Showtimes management
+* 🎟️ Book tickets online
+* 👤 User management (login/register - optional)
+* 🗂️ MVC architecture (Controller - Service - Repository)
+* 🐳 Docker support for easy deployment
 
-* **Ngôn ngữ:** Java (JDK 1.8 hoặc mới hơn)
-* **Giao diện:** JavaFX, JFoenix (Material Design components)
-* **Cơ sở dữ liệu:** SQLite (File `.db` đi kèm trong project)
-* **Công cụ hỗ trợ:** Scene Builder (thiết kế UI)
+---
 
-## 🚀 Hướng dẫn cài đặt và chạy ứng dụng
+## 🛠️ Tech Stack
 
-### 1. Yêu cầu hệ thống
-* Đã cài đặt **Java Development Kit (JDK)**.
-* IDE khuyên dùng: **IntelliJ IDEA** hoặc **Eclipse**.
+* **Backend:** Spring Boot
+* **Database:** MySQL
+* **ORM:** Spring Data JPA / Hibernate
+* **Frontend:** Thymeleaf (HTML, CSS)
+* **Build Tool:** Maven
+* **Containerization:** Docker
 
-### 2. Tải mã nguồn
-Mở terminal và chạy lệnh:
+---
+
+## 📁 Project Structure
+
+```
+rapchieuphim/
+│── src/
+│   ├── main/
+│   │   ├── java/com/example/rapchieuphim/
+│   │   │   ├── config/
+│   │   │   ├── controllers/
+│   │   │   ├── model/
+│   │   │   ├── repositories/
+│   │   │   └── RapchieuphimApplication.java
+│   │   └── resources/
+│   │       ├── templates/
+│   │       └── application.properties
+│
+│── docker-compose.yml
+│── pom.xml
+│── README.md
+```
+
+---
+
+## ⚙️ Installation & Run
+
+### 🔹 1. Clone repository
+
 ```bash
-git clone [https://github.com/tanint06/rapchieuphim.git](https://github.com/tanint06/rapchieuphim.git)
+git clone https://github.com/tanint06/rapchieuphim.git
 cd rapchieuphim
+```
+
+---
+
+### 🔹 2. Run with Docker (recommended)
+
+```bash
+docker-compose up
+```
+
+👉 This will:
+
+* Start MySQL database
+* Run Spring Boot application
+
+---
+
+### 🔹 3. Run manually (without Docker)
+
+#### Start MySQL first
+
+Update your database config in:
+
+```
+src/main/resources/application.properties
+```
+
+Example:
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/rapchieuphim
+spring.datasource.username=root
+spring.datasource.password=your_password
+```
+
+#### Run project
+
+```bash
+mvn spring-boot:run
+```
+
+---
+
+## 🌐 Access Application
+
+Open browser:
+
+```
+http://localhost:8080
+```
+
+---
+
+## 📌 Notes
+
+* ❌ Do NOT commit:
+
+  * `mysql_data/`
+  * `target/`
+* ✔️ Use `.gitignore` to exclude unnecessary files
+* 🔐 Do not expose real database passwords
+
+---
+
+## 📸 Demo (Optional)
+
+*Add screenshots of your UI here*
+
+---
+
+## 🤝 Contribution
+
+Contributions are welcome!
+
+1. Fork this repository
+2. Create new branch (`git checkout -b feature/your-feature`)
+3. Commit changes
+4. Push and create Pull Request
+
+---
+
+## 📄 License
+
+This project is for educational purposes.
+
+---
+
+## 👨‍💻 Author
+
+* GitHub:   https://github.com/Developer0630 __ Phan Văn Nhật Hiếu
+            https://github.com/tanint06      __ Phạm Kỳ Tân
+            ...                              __ Phan Ngọc Hoàng Sơn
+            ...                              __ Trần Viết Nhật
+
+---

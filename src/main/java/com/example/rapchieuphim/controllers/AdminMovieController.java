@@ -13,14 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.rapchieuphim.model.Movie;
 import com.example.rapchieuphim.model.User;
-
 import com.example.rapchieuphim.repositories.MovieRepository;
-
 
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/admin/movies") // Đặt tiền tố chung cho tất cả các đường dẫn trong file này
+@RequestMapping("admin/movies") // Đặt tiền tố chung cho tất cả các đường dẫn trong file này
 public class AdminMovieController {
 
     @Autowired
@@ -40,7 +38,7 @@ public class AdminMovieController {
 
         List<Movie> movies = movieRepository.findByActiveTrue();
         model.addAttribute("movies", movies);
-        return "/admin/admin_movies";
+        return "admin/admin_movies";
     }
 
     // 2. Mở form Thêm phim mới
@@ -49,7 +47,7 @@ public class AdminMovieController {
         if (!isAdmin(session)) return "redirect:/";
 
         model.addAttribute("movie", new Movie()); // Gửi 1 object Movie rỗng sang form
-        return "/admin/movie_form";
+        return "admin/movie_form";
     }
 
     // 3. Mở form Sửa phim (Lấy dữ liệu phim cũ đưa lên form)
@@ -61,7 +59,7 @@ public class AdminMovieController {
         if (movie == null) return "redirect:/admin/movies";
 
         model.addAttribute("movie", movie);
-        return "/admin/movie_form";
+        return "admin/movie_form";
     }
 
     // 4. Xử lý Lưu phim (Dùng chung cho cả Thêm và Sửa)
@@ -70,16 +68,16 @@ public class AdminMovieController {
         if (!isAdmin(session)) return "redirect:/";
 
         movieRepository.save(movie); // Nếu movie có ID thì nó sẽ Sửa (Update), chưa có ID nó sẽ Thêm (Insert)
-        return "redirect:/admin/movies";
+        return "redirect:admin/movies";
     }
 
     // 5. Xử lý Xóa phim
-    @GetMapping("/delete/{id}")
+    @GetMapping("delete/{id}")
     public String deleteMovie(@PathVariable Long id, HttpSession session) {
         if (!isAdmin(session)) return "redirect:/";
 
         movieRepository.deleteById(id);
-        return "redirect:/admin/movies";
+        return "redirect:admin/movies";
     }
     
 }

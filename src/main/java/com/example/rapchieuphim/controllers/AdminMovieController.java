@@ -18,7 +18,7 @@ import com.example.rapchieuphim.repositories.MovieRepository;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("admin/movies") // Đặt tiền tố chung cho tất cả các đường dẫn trong file này
+@RequestMapping("/admin/movies") // Đặt tiền tố chung cho tất cả các đường dẫn trong file này
 public class AdminMovieController {
 
     @Autowired
@@ -77,7 +77,7 @@ public class AdminMovieController {
         if (!isAdmin(session)) return "redirect:/";
 
         movieRepository.deleteById(id);
-        return "redirect:admin/movies";
+        return "redirect:/admin/movies";
     }
     
 }

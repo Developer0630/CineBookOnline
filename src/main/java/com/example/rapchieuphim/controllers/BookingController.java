@@ -103,7 +103,7 @@ public class BookingController {
             ticket.setTotalPrice(showtime.getPrice());
             ticketRepository.save(ticket);
         }
-        return "redirect:booking/my-tickets";
+        return "redirect:/booking/my-tickets";
     }
 
     @GetMapping("/my-tickets")

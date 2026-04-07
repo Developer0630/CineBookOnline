@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpSession;
 
 
 @Controller
-@RequestMapping("admin/showtimes")
+@RequestMapping("/admin/showtimes")
 public class AdminShowtimeController {
     @Autowired
     private MovieRepository movieRepository;
@@ -28,7 +28,7 @@ public class AdminShowtimeController {
         User user = (User) session.getAttribute("loggedInUser");
         return user != null && "ADMIN".equals(user.getRole());
     }
-    @GetMapping("add")
+    @GetMapping("/add")
     public String showAddShowtimeForm(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/";
 
@@ -37,7 +37,7 @@ public class AdminShowtimeController {
         model.addAttribute("movies", movieRepository.findAll());
        
         
-        return "admin/showtime_form";
+        return "/admin/showtime_form";
     }
     @PostMapping("/save")
     public String saveShowtime(@ModelAttribute Showtime showtime, HttpSession session) {
@@ -46,6 +46,6 @@ public class AdminShowtimeController {
         // Lưu suất chiếu mới vào database (cần tạo repository và service cho Showtime)
         showtimeRepository.save(showtime);
         
-        return "redirect:admin/movies"; // Quay về trang danh sách phim sau khi lưu
+        return "redirect:/admin/movies"; // Quay về trang danh sách phim sau khi lưu
     }
 }

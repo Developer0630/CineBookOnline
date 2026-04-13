@@ -37,7 +37,7 @@ public class AdminShowtimeController {
         model.addAttribute("movies", movieRepository.findAll());
        
         
-        return "/admin/showtime_form";
+        return "admin/showtime_form";
     }
     @PostMapping("/save")
     public String saveShowtime(@ModelAttribute Showtime showtime, HttpSession session) {

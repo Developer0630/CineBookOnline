@@ -36,7 +36,7 @@ public class AdminMovieController {
     public String listMovies(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/"; // Không phải Admin -> Đuổi về trang chủ
 
-        List<Movie> movies = movieRepository.findByActiveTrue();
+        List<Movie> movies = movieRepository.findAll();
         model.addAttribute("movies", movies);
         return "admin/admin_movies";
     }

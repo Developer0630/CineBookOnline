@@ -27,15 +27,12 @@ public class AdminMovieController {
     private UserRepository userRepository;
 
     @GetMapping
-    public String listMovies(Principal principal, Model model) {
-        User user = userRepository.findByUsername(principal.getName()).orElse(null);
-        if (user == null) return "redirect:/login";
-        if (user.getRoles().equals("ADMIN")){
+    public String listMovies(Model model) {
+        
             List<Movie> movies = movieRepository.findAll();
-            model.addAttribute("movies", movies);
-            return "admin/admin_movies";
-        } ; // Chỉ admin mới được xem trang này
-        List<Movie> movies = movieRepository.findByActiveTrue();
+           
+        
+        
         model.addAttribute("movies", movies);
         return "admin/admin_movies";
     }

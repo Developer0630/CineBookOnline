@@ -1,16 +1,21 @@
 package com.example.rapchieuphim.controllers;
 
+import com.example.rapchieuphim.model.ERole;
+import com.example.rapchieuphim.model.Role;
 import com.example.rapchieuphim.model.User;
-import jakarta.servlet.http.HttpSession;
+import com.example.rapchieuphim.repositories.RoleRepository;
+import com.example.rapchieuphim.repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.rapchieuphim.repositories.UserRepository;
+import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 public class AuthController {
@@ -18,63 +23,78 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
-    // HIỂN THỊ TRANG ĐĂNG KÝ
+    // THÊM MỚI: Công cụ mã hóa mật khẩu và truy xuất quyền
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    // ==========================================
+    // PHẦN ĐĂNG KÝ
+    // ==========================================
     @GetMapping("/register")
     public String showRegisterForm() {
         return "register"; 
     }
 
-    // XỬ LÝ ĐĂNG KÝ
     @PostMapping("/register")
     public String registerUser(@RequestParam String username, 
+                               @RequestParam String email, // Bắt buộc thêm Email
                                @RequestParam String password, 
                                Model model) {
+        
+        // 1. Kiểm tra trùng lặp
         if (userRepository.existsByUsername(username)) {
             model.addAttribute("error", "Tên tài khoản đã tồn tại!");
             return "register";
         }
-        
-        User newUser = new User(username, password);
-        if (newUser.getUsername().equalsIgnoreCase("admin")) {
-            newUser.setRole("ADMIN"); // Nếu tên đăng nhập là "admin" thì cho làm Quản trị viên
-        } else {
-            newUser.setRole("USER");  // Khách hàng bình thường
+        if (userRepository.existsByEmail(email)) {
+            model.addAttribute("error", "Email đã được sử dụng!");
+            return "register";
         }
+        
+        // 2. Tạo User mới và MÃ HÓA MẬT KHẨU
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setEmail(email);
+        newUser.setPassword(passwordEncoder.encode(password)); // Biến "123456" thành "$2a$10$..."
+
+        // 3. Phân quyền (Role) kiểu mới
+        Set<Role> roles = new HashSet<>();
+        
+        if (username.equalsIgnoreCase("admin")) {
+            // Lấy quyền ADMIN từ Database
+            Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+                    .orElseThrow(() -> new RuntimeException("Lỗi: Không tìm thấy Role Admin."));
+            roles.add(adminRole);
+        } else {
+            // Lấy quyền USER từ Database
+            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                    .orElseThrow(() -> new RuntimeException("Lỗi: Không tìm thấy Role User."));
+            roles.add(userRole);
+        }
+        
+        newUser.setRoles(roles); // Gán danh sách quyền cho User
         userRepository.save(newUser); // Lưu vào database
         
         model.addAttribute("success", "Đăng ký thành công! Vui lòng đăng nhập.");
         return "login";
     }
 
-    // HIỂN THỊ TRANG ĐĂNG NHẬP
+    // ==========================================
+    // PHẦN ĐĂNG NHẬP & ĐĂNG XUẤT
+    // ==========================================
+    
     @GetMapping("/login")
     public String showLoginForm() {
         return "login";
     }
 
-    // XỬ LÝ ĐĂNG NHẬP
-    @PostMapping("/login")
-    public String loginUser(@RequestParam String username, 
-                            @RequestParam String password, 
-                            HttpSession session, 
-                            Model model) {
-        User user = userRepository.findByUsernameAndPassword(username, password);
-        
-        if (user != null) {
-            // Đăng nhập đúng -> Lưu thông tin vào Session
-            session.setAttribute("loggedInUser", user);
-            return "redirect:/"; // Chuyển hướng thẳng vào Trang Chủ
-        } else {
-            // Đăng nhập sai
-            model.addAttribute("error", "Sai tài khoản hoặc mật khẩu!");
-            return "login";
-        }
-    }
-
-    // ĐĂNG XUẤT
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate(); // Xóa phiên làm việc
-        return "redirect:/login"; // Quay lại trang đăng nhập
-    }
+    /* * LƯU Ý QUAN TRỌNG: 
+     * Mình tạm thời comment phần xử lý @PostMapping("/login") và logout lại.
+     * Lý do: Khi dùng Spring Security và JWT, việc kiểm tra đăng nhập và quản lý 
+     * Session/Token sẽ do các bộ lọc (Filter) của Spring Security tự động đảm nhận. 
+     * Chúng ta sẽ không tự so sánh mật khẩu bằng tay trong Controller nữa.
+     */
 }

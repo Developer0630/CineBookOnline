@@ -1,6 +1,7 @@
 package com.example.rapchieuphim.controllers;
 
-import java.util.List;
+import java.security.Principal;
+import java.util.List; // Thêm import này
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,44 +14,43 @@ import com.example.rapchieuphim.model.Showtime;
 import com.example.rapchieuphim.model.User;
 import com.example.rapchieuphim.repositories.MovieRepository;
 import com.example.rapchieuphim.repositories.ShowtimeRepository;
-
-import jakarta.servlet.http.HttpSession;
+import com.example.rapchieuphim.repositories.UserRepository; // Cần lấy user từ DB
 
 @Controller
 public class HomeController {
 
-    // Gọi MovieRepository để làm việc với bảng Movies
     @Autowired
     private MovieRepository movieRepository;
+    
     @Autowired
     private ShowtimeRepository showtimeRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping("/")
-    public String home(HttpSession session, Model model) {
-        // 1. Kiểm tra đăng nhập
-        User user = (User) session.getAttribute("loggedInUser");
-        if (user == null) {
-            return "redirect:/login";
-        }
-        
-        // 2. Lấy toàn bộ danh sách phim từ Database
-        List<Movie> movieList = movieRepository.findAll();
-        
-        // 3. Truyền dữ liệu sang giao diện (HTML)
+public String home(Principal principal, Model model) {
+    if (principal != null) {
+        String username = principal.getName();
+        // Tìm User trong DB dựa trên username
+        User user = userRepository.findByUsername(username).orElse(null);
+        // Truyền nguyên đối tượng user sang để index.html không bị lỗi null
         model.addAttribute("user", user); 
-        model.addAttribute("movies", movieList); // Truyền danh sách phim sang HTML với tên biến là 'movies'
-        
-        return "index";
     }
-    @GetMapping("/movie/detail/{id}")
-public String movieDetail(@PathVariable Long id, Model model) {
-    Movie movie = movieRepository.findById(id).orElse(null);
-    // Lấy lịch chiếu của riêng phim này
-    List<Showtime> showtimes = showtimeRepository.findByMovieId(id);
     
-    model.addAttribute("movie", movie);
-    model.addAttribute("showtimes", showtimes);
-    return "customer/movie_detail";
+    List<Movie> movieList = movieRepository.findAll();
+    model.addAttribute("movies", movieList); 
+    
+    return "index";
 }
 
+    @GetMapping("/movie/detail/{id}")
+    public String movieDetail(@PathVariable Long id, Model model) {
+        Movie movie = movieRepository.findById(id).orElse(null);
+        List<Showtime> showtimes = showtimeRepository.findByMovieId(id);
+        
+        model.addAttribute("movie", movie);
+        model.addAttribute("showtimes", showtimes);
+        return "customer/movie_detail";
+    }
 }

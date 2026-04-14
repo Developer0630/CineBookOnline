@@ -1,125 +1,86 @@
 package com.example.rapchieuphim.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "Users")
-public class User { // Đã sửa chữ U viết hoa
-    
+public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    // Đảm bảo username không được trùng và không được bỏ trống
+    @Column(unique = true, nullable = false)
     private String username;
-    private String fullname;
-    private String email;
-    private String phone;
-    private String address;
-    private String role;
-    private String avatar;
-    private String gender;
-    private String birthday;
+
+    @Column(nullable = false)
     private String password;
 
-    public User() { // Đã sửa tên Constructor
+    // Đảm bảo email không được trùng
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    private String fullname;
+    private String phone;
+    private String address;
+    private String avatar;
+    private String gender;
+
+    // Đổi sang LocalDate để dễ thao tác với ngày tháng
+    private LocalDate birthday; 
+
+    // QUAN TRỌNG: Mối quan hệ N-N với bảng Role thay cho String role cũ
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles", 
+               joinColumns = @JoinColumn(name = "user_id"), 
+               inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
+    // Constructors
+    public User() {
     }
 
-    public User(String username, String password) { // Đã sửa tên Constructor
+    public User(String username, String password) {
         this.username = username;
         this.password = password;
     }
 
-    // ==== THÊM GETTER/SETTER CHO ID ====
-    public Long getId() {
-        return id;
-    }
+    // ==== GETTERS / SETTERS ====
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-    // ====================================
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getUsername() {
-        return username;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getFullname() { return fullname; }
+    public void setFullname(String fullname) { this.fullname = fullname; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getFullname() {
-        return fullname;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getAvatar() { return avatar; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
-    public String getPhone() {
-        return phone;
-    }
+    public LocalDate getBirthday() { return birthday; }
+    public void setBirthday(LocalDate birthday) { this.birthday = birthday; }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(String birthday) {
-        this.birthday = birthday;
-    }
+    public Set<Role> getRoles() { return roles; }
+    public void setRoles(Set<Role> roles) { this.roles = roles; }
 }

@@ -2,35 +2,88 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Đăng nhập</title>
+    <title>Đăng nhập - CineBookOnline</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); width: 350px; text-align: center; }
-        h2 { color: #333; margin-bottom: 25px; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; outline: none;}
-        input:focus { border-color: #667eea; }
-        button { width: 100%; padding: 12px; background-color: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s;}
-        button:hover { background-color: #764ba2; }
-        .error { color: #d9534f; font-weight: bold; margin-bottom: 15px; }
-        .success { color: #28a745; font-weight: bold; margin-bottom: 15px; }
-        .link { margin-top: 20px; font-size: 14px; }
-        .link a { color: #667eea; text-decoration: none; font-weight: bold; }
+        /* Đổi sang Dark Theme mang cảm giác rạp chiếu phim */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; margin: 0; 
+            background: linear-gradient(135deg, #1f1c2c 0%, #928DAB 100%); 
+            color: #ffffff;
+        }
+        .card { 
+            background: rgba(20, 20, 20, 0.85); 
+            padding: 40px; border-radius: 15px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+            width: 380px; text-align: center; 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        h2 { color: #e50914; margin-bottom: 30px; letter-spacing: 2px; text-transform: uppercase;}
+        
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-group i { 
+            position: absolute; left: 15px; top: 50%; 
+            transform: translateY(-50%); color: #888; 
+        }
+        input { 
+            width: 100%; padding: 14px 14px 14px 45px; /* Để trống chỗ cho icon */
+            background: rgba(255, 255, 255, 0.1); border: 1px solid transparent; 
+            color: white; border-radius: 8px; box-sizing: border-box; font-size: 15px; outline: none;
+            transition: 0.3s;
+        }
+        input::placeholder { color: #aaa; }
+        input:focus { border-color: #e50914; background: rgba(255, 255, 255, 0.15); }
+        
+        button { 
+            width: 100%; padding: 14px; background-color: #e50914; 
+            color: white; border: none; border-radius: 8px; cursor: pointer; 
+            font-size: 16px; font-weight: bold; transition: 0.3s; margin-top: 10px;
+        }
+        button:hover { background-color: #f40612; box-shadow: 0 0 15px rgba(229, 9, 20, 0.5); }
+        
+        /* Chỉnh lại phần thông báo lỗi của Spring Security */
+        .alert { padding: 10px; border-radius: 6px; margin-bottom: 20px; font-weight: bold; font-size: 14px;}
+        .error { background-color: rgba(217, 83, 79, 0.2); color: #ff6b6b; border: 1px solid #d9534f; }
+        .success { background-color: rgba(40, 167, 69, 0.2); color: #4dd0e1; border: 1px solid #28a745; }
+        
+        .link { margin-top: 25px; font-size: 14px; color: #ccc;}
+        .link a { color: #e50914; text-decoration: none; font-weight: bold; transition: 0.3s;}
+        .link a:hover { color: #ffffff; text-decoration: underline; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>🎬 ĐĂNG NHẬP</h2>
-        <div class="error" th:if="${error}" th:text="${error}"></div>
-        <div class="success" th:if="${success}" th:text="${success}"></div>
+        <h2>🎬 CineBook</h2>
         
-        <form action="/login" method="post">
-            <input type="text" name="username" placeholder="Tên đăng nhập" required>
-            <input type="password" name="password" placeholder="Mật khẩu" required>
-            <button type="submit">Đăng Nhập</button>
+        <div class="alert error" th:if="${param.error}">
+            <i class="fas fa-exclamation-circle"></i> Sai tên đăng nhập hoặc mật khẩu!
+        </div>
+        
+        <div class="alert success" th:if="${param.logout}">
+            <i class="fas fa-check-circle"></i> Đăng xuất thành công!
+        </div>
+
+        <div class="alert success" th:if="${success}" th:text="${success}"></div>
+        
+        <form th:action="@{/perform_login}" method="POST">
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="username" name="username" placeholder="Tên đăng nhập" required>
+            </div>
+            
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" name="password" placeholder="Mật khẩu" required>
+            </div>
+            
+            <button type="submit"><i class="fas fa-sign-in-alt"></i> Đăng Nhập</button>
         </form>
         
         <div class="link">
-            Chưa có tài khoản? <a href="/register">Đăng ký tại đây</a>
+            Chưa có tài khoản? <a href="/register">Đăng ký ngay</a>
         </div>
     </div>
 </body>

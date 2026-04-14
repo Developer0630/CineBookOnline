@@ -12,49 +12,30 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.rapchieuphim.model.Movie;
-import com.example.rapchieuphim.model.User;
 import com.example.rapchieuphim.repositories.MovieRepository;
 
-import jakarta.servlet.http.HttpSession;
-
 @Controller
-@RequestMapping("/admin/movies") // Đặt tiền tố chung cho tất cả các đường dẫn trong file này
+@RequestMapping("/admin/movies")
 public class AdminMovieController {
 
     @Autowired
     private MovieRepository movieRepository;
-   
 
-    // Hàm dùng chung để kiểm tra quyền Admin
-    private boolean isAdmin(HttpSession session) {
-        User user = (User) session.getAttribute("loggedInUser");
-        return user != null && "ADMIN".equals(user.getRole());
-    }
-
-    // 1. Xem danh sách phim (Giao diện bảng)
     @GetMapping
-    public String listMovies(HttpSession session, Model model) {
-        if (!isAdmin(session)) return "redirect:/"; // Không phải Admin -> Đuổi về trang chủ
-
+    public String listMovies(Model model) {
         List<Movie> movies = movieRepository.findAll();
         model.addAttribute("movies", movies);
         return "admin/admin_movies";
     }
 
-    // 2. Mở form Thêm phim mới
     @GetMapping("/add")
-    public String showAddForm(HttpSession session, Model model) {
-        if (!isAdmin(session)) return "redirect:/";
-
-        model.addAttribute("movie", new Movie()); // Gửi 1 object Movie rỗng sang form
+    public String showAddForm(Model model) {
+        model.addAttribute("movie", new Movie());
         return "admin/movie_form";
     }
 
-    // 3. Mở form Sửa phim (Lấy dữ liệu phim cũ đưa lên form)
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, HttpSession session, Model model) {
-        if (!isAdmin(session)) return "redirect:/";
-
+    public String showEditForm(@PathVariable Long id, Model model) {
         Movie movie = movieRepository.findById(id).orElse(null);
         if (movie == null) return "redirect:/admin/movies";
 
@@ -62,22 +43,15 @@ public class AdminMovieController {
         return "admin/movie_form";
     }
 
-    // 4. Xử lý Lưu phim (Dùng chung cho cả Thêm và Sửa)
     @PostMapping("/save")
-    public String saveMovie(@ModelAttribute Movie movie, HttpSession session) {
-        if (!isAdmin(session)) return "redirect:/";
-
-        movieRepository.save(movie); // Nếu movie có ID thì nó sẽ Sửa (Update), chưa có ID nó sẽ Thêm (Insert)
-        return "redirect:admin/movies";
+    public String saveMovie(@ModelAttribute Movie movie) {
+        movieRepository.save(movie);
+        return "redirect:/admin/movies";
     }
 
-    // 5. Xử lý Xóa phim
-    @GetMapping("delete/{id}")
-    public String deleteMovie(@PathVariable Long id, HttpSession session) {
-        if (!isAdmin(session)) return "redirect:/";
-
+    @GetMapping("/delete/{id}")
+    public String deleteMovie(@PathVariable Long id) {
         movieRepository.deleteById(id);
         return "redirect:/admin/movies";
     }
-    
 }

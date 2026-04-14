@@ -1,5 +1,6 @@
 package com.example.rapchieuphim.controllers;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,8 +19,8 @@ import com.example.rapchieuphim.model.Ticket;
 import com.example.rapchieuphim.model.User;
 import com.example.rapchieuphim.repositories.ShowtimeRepository;
 import com.example.rapchieuphim.repositories.TicketRepository;
+import com.example.rapchieuphim.repositories.UserRepository;
 
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/booking")
@@ -30,6 +31,9 @@ public class BookingController {
 
     @Autowired
     private TicketRepository ticketRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     // 1. TRANG CHỌN GHẾ: Khóa những ghế đã có trong DB
     @GetMapping("/{showtimeId}")
@@ -52,9 +56,10 @@ public class BookingController {
     @PostMapping("/confirm")
     public String confirmBooking(@RequestParam Long showtimeId,
                                  @RequestParam List<String> seatNumbers,
-                                 HttpSession session,
+                                    Principal principal,
                                  Model model) {
-        User user = (User) session.getAttribute("loggedInUser");
+                                    
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
         if (user == null) return "redirect:/login";
 
         Showtime showtime = showtimeRepository.findById(showtimeId).orElse(null);
@@ -87,8 +92,8 @@ public class BookingController {
     @PostMapping("/save")
     public String saveTickets(@RequestParam Long showtimeId,
                               @RequestParam String seats,
-                              HttpSession session) {
-        User user = (User) session.getAttribute("loggedInUser");
+                              Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
         if (user == null) return "redirect:/login";
 
         Showtime showtime = showtimeRepository.findById(showtimeId).orElse(null);
@@ -107,8 +112,8 @@ public class BookingController {
     }
 
     @GetMapping("/my-tickets")
-    public String showMyTickets(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("loggedInUser");
+    public String showMyTickets(Principal principal, Model model) {
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
         if (user == null) return "redirect:/login";
 
         List<Ticket> myTickets = ticketRepository.findByUserId(user.getId());
@@ -117,8 +122,8 @@ public class BookingController {
     }
 
     @PostMapping("/cancel-ticket/{id}")
-    public String cancelTicket(@PathVariable Long id, HttpSession session) {
-        User user = (User) session.getAttribute("loggedInUser");
+    public String cancelTicket(@PathVariable Long id, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
         if (user == null) return "redirect:/login";
 
         Ticket ticket = ticketRepository.findById(id).orElse(null);

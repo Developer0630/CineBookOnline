@@ -38,7 +38,7 @@ public String home(Principal principal, Model model) {
         model.addAttribute("user", user); 
     }
     
-    List<Movie> movieList = movieRepository.findAll();
+    List<Movie> movieList = movieRepository.findByActiveTrue();
     model.addAttribute("movies", movieList); 
     
     return "index";
